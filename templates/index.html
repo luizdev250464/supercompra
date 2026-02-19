@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SuperCompara 🛒</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --verde:    #00c853;
+      --fundo:    #0d1117;
+      --card:     #161b22;
+      --borda:    #21262d;
+      --texto:    #e6edf3;
+      --mudo:     #8b949e;
+      --sav:      #2ecc71;
+      --taq:      #f7931e;
+      --koc:      #5b9bd5;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--fundo);
+      color: var(--texto);
+      min-height: 100vh;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 40px;
+      border-bottom: 1px solid var(--borda);
+      background: rgba(22,27,34,0.9);
+      backdrop-filter: blur(12px);
+      position: sticky; top: 0; z-index: 100;
+      flex-wrap: wrap; gap: 10px;
+    }
+
+    .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.5rem; }
+    .logo span { color: var(--verde); }
+
+    .badges { display: flex; gap: 8px; flex-wrap: wrap; }
+    .badge { padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 500; }
+    .badge-sav { background: rgba(46,204,113,0.15); color: var(--sav); border: 1px solid rgba(46,204,113,0.3); }
+    .badge-taq { background: rgba(247,147,30,0.15); color: var(--taq); border: 1px solid rgba(247,147,30,0.3); }
+    .badge-koc { background: rgba(91,155,213,0.2); color: var(--koc); border: 1px solid rgba(91,155,213,0.3); }
+
+    main { max-width: 1000px; margin: 0 auto; padding: 40px 20px 60px; }
+
+    h1 { font-family: 'Syne', sans-serif; font-size: 2.4rem; font-weight: 800; line-height: 1.1; margin-bottom: 8px; }
+    h1 em { color: var(--verde); font-style: normal; }
+    .subtitulo { color: var(--mudo); font-size: 1rem; margin-bottom: 36px; }
+
+    .input-box {
+      background: var(--card);
+      border: 1px solid var(--borda);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .input-box label {
+      display: block; font-size: 0.85rem; color: var(--mudo);
+      margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+
+    textarea {
+      width: 100%; background: var(--fundo); border: 1px solid var(--borda);
+      border-radius: 10px; color: var(--texto); font-family: 'DM Sans', sans-serif;
+      font-size: 1rem; padding: 14px; resize: vertical; min-height: 120px;
+      outline: none; transition: border-color 0.2s;
+    }
+    textarea:focus { border-color: var(--verde); }
+    textarea::placeholder { color: var(--mudo); }
+
+    .lojas-selector { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+
+    .loja-toggle {
+      display: flex; align-items: center; gap: 8px; padding: 8px 16px;
+      border-radius: 8px; cursor: pointer; border: 1px solid var(--borda);
+      background: var(--fundo); color: var(--mudo); font-size: 0.88rem;
+      transition: all 0.2s; user-select: none;
+    }
+    .loja-toggle input { display: none; }
+    .loja-toggle.ativo-sav { border-color: var(--sav); background: rgba(46,204,113,0.1); color: var(--sav); }
+    .loja-toggle.ativo-taq { border-color: var(--taq); background: rgba(247,147,30,0.1); color: var(--taq); }
+    .loja-toggle.ativo-koc { border-color: var(--koc); background: rgba(91,155,213,0.1); color: var(--koc); }
+
+    .hint { font-size: 0.8rem; color: var(--mudo); margin-top: 8px; }
+
+    .btn-buscar {
+      width: 100%; margin-top: 16px; padding: 14px; background: var(--verde);
+      color: #000; border: none; border-radius: 10px; font-family: 'Syne', sans-serif;
+      font-weight: 700; font-size: 1rem; cursor: pointer; transition: transform 0.15s, background 0.2s;
+    }
+    .btn-buscar:hover { background: #00e676; transform: translateY(-1px); }
+    .btn-buscar:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    /* Nota informativa */
+    .info-nota {
+      background: rgba(91,155,213,0.08);
+      border: 1px solid rgba(91,155,213,0.2);
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 24px;
+      font-size: 0.83rem;
+      color: var(--mudo);
+      line-height: 1.5;
+    }
+    .info-nota strong { color: var(--texto); }
+
+    #loading { display: none; text-align: center; padding: 40px; }
+    .spinner {
+      width: 40px; height: 40px; border: 3px solid var(--borda);
+      border-top-color: var(--verde); border-radius: 50%;
+      animation: spin 0.8s linear infinite; margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #totais { display: none; margin-bottom: 24px; }
+    #totais.visivel { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+
+    .total-card {
+      background: var(--card); border: 1px solid var(--borda);
+      border-radius: 14px; padding: 18px; text-align: center;
+    }
+    .total-card .loja-nome { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
+    .total-card .valor { font-family: 'Syne', sans-serif; font-size: 1.45rem; font-weight: 700; }
+    .total-card.otimo { border-color: var(--verde); background: rgba(0,200,83,0.06); }
+    .total-card.otimo .loja-nome { color: var(--verde); }
+    .total-card.otimo .valor { color: var(--verde); }
+    .total-sav .loja-nome { color: var(--sav); }
+    .total-taq .loja-nome { color: var(--taq); }
+    .total-koc .loja-nome { color: var(--koc); }
+    .economia-tag { font-size: 0.72rem; color: var(--mudo); margin-top: 4px; }
+
+    #resultados { display: none; }
+    #resultados.visivel { display: block; }
+    .tabela-header { display: flex; align-items: center; margin-bottom: 14px; }
+    .tabela-titulo { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700; }
+    .tabela-wrapper { overflow-x: auto; }
+
+    table { width: 100%; border-collapse: collapse; min-width: 500px; }
+    thead tr { background: rgba(255,255,255,0.03); }
+    th {
+      padding: 12px 14px; text-align: left; font-size: 0.78rem;
+      text-transform: uppercase; letter-spacing: 0.6px;
+      color: var(--mudo); border-bottom: 1px solid var(--borda); white-space: nowrap;
+    }
+    tbody tr { border-bottom: 1px solid var(--borda); transition: background 0.15s; }
+    tbody tr:hover { background: rgba(255,255,255,0.02); }
+    td { padding: 13px 14px; font-size: 0.92rem; vertical-align: middle; }
+
+    .item-nome { font-weight: 500; }
+    .preco-cell { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 0.92rem; display: block; }
+    .preco-barato { color: var(--verde); }
+    .preco-barato::after { content: ' ✓'; font-size: 0.7rem; }
+    .preco-caro { color: var(--mudo); }
+    .preco-nd { color: #333; font-size: 0.82rem; }
+
+    .tag-melhor { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; }
+    .tag-sav { background: rgba(46,204,113,0.15); color: var(--sav); }
+    .tag-taq { background: rgba(247,147,30,0.15); color: var(--taq); }
+    .tag-koc { background: rgba(91,155,213,0.15); color: var(--koc); }
+
+    .link-produto { color: var(--mudo); text-decoration: none; font-size: 0.78rem; display: block; margin-top: 2px; }
+    .link-produto:hover { color: var(--texto); }
+
+    #erros-box {
+      display: none; background: rgba(255,80,80,0.08); border: 1px solid rgba(255,80,80,0.2);
+      border-radius: 10px; padding: 16px; margin-top: 20px; font-size: 0.85rem; color: #ff8080;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Super<span>Compara</span></div>
+  <div class="badges">
+    <span class="badge badge-sav">💚 Savegnago</span>
+    <span class="badge badge-taq">🧡 Taquaral</span>
+    <span class="badge badge-koc">💙 Super Koch</span>
+  </div>
+</header>
+
+<main>
+  <h1>Compare preços e<br>monte o <em>carrinho ideal</em></h1>
+  <p class="subtitulo">Digite sua lista — buscamos nos supermercados selecionados e mostramos o mais barato em cada item.</p>
+
+  <div class="info-nota">
+    ℹ️ <strong>Sobre as lojas:</strong> Pão de Açúcar e Carrefour bloqueiam acesso externo a suas APIs. As lojas ativas abaixo têm APIs abertas e funcionam normalmente. Você pode adicionar qualquer site que queira — é só me pedir!
+  </div>
+
+  <div class="input-box">
+    <label>Sua lista de compras</label>
+    <textarea id="lista" placeholder="arroz 5kg&#10;feijão carioca&#10;leite integral&#10;frango congelado&#10;macarrão espaguete&#10;azeite de oliva"></textarea>
+    <p class="hint">💡 Um item por linha. Seja específico: "arroz tio joão 5kg" funciona melhor que só "arroz".</p>
+
+    <label style="margin-top:18px">Supermercados para comparar</label>
+    <div class="lojas-selector">
+      <label class="loja-toggle ativo-sav" id="toggle-savegnago">
+        <input type="checkbox" value="savegnago" checked onchange="atualizarToggle(this)">
+        💚 Savegnago
+      </label>
+      <label class="loja-toggle ativo-taq" id="toggle-taquaral">
+        <input type="checkbox" value="taquaral" checked onchange="atualizarToggle(this)">
+        🧡 Taquaral
+      </label>
+      <label class="loja-toggle ativo-koc" id="toggle-superkoch">
+        <input type="checkbox" value="superkoch" checked onchange="atualizarToggle(this)">
+        💙 Super Koch
+      </label>
+    </div>
+
+    <button class="btn-buscar" onclick="buscar()">🔍 Buscar melhores preços</button>
+  </div>
+
+  <div id="loading">
+    <div class="spinner"></div>
+    <p style="color:var(--mudo)" id="loading-msg">Buscando preços nos supermercados...</p>
+  </div>
+
+  <div id="totais"></div>
+
+  <div id="resultados">
+    <div class="tabela-header">
+      <span class="tabela-titulo">Comparação item a item</span>
+    </div>
+    <div class="tabela-wrapper">
+      <table>
+        <thead id="tabela-head"></thead>
+        <tbody id="tabela-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="erros-box"></div>
+</main>
+
+<script>
+  const CORES = {
+    savegnago: { classe: 'sav', emoji: '💚', nome: 'Savegnago' },
+    taquaral:  { classe: 'taq', emoji: '🧡', nome: 'Taquaral' },
+    superkoch: { classe: 'koc', emoji: '💙', nome: 'Super Koch' },
+  };
+
+  function atualizarToggle(cb) {
+    const label = document.getElementById('toggle-' + cb.value);
+    const c = CORES[cb.value];
+    if (cb.checked) label.classList.add('ativo-' + c.classe);
+    else label.classList.remove('ativo-' + c.classe);
+  }
+
+  function getLojasSelecionadas() {
+    return [...document.querySelectorAll('.lojas-selector input:checked')].map(cb => cb.value);
+  }
+
+  function fmt(v) { return 'R$ ' + v.toFixed(2).replace('.', ','); }
+
+  async function buscar() {
+    const texto = document.getElementById('lista').value.trim();
+    if (!texto) return alert('Adicione itens à lista.');
+    const itens = texto.split('\n').map(l => l.trim()).filter(Boolean);
+    const lojas = getLojasSelecionadas();
+    if (lojas.length === 0) return alert('Selecione pelo menos um supermercado.');
+
+    document.querySelector('.btn-buscar').disabled = true;
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('loading-msg').textContent =
+      `Buscando ${itens.length} item(ns) em ${lojas.length} supermercado(s)...`;
+    document.getElementById('totais').className = '';
+    document.getElementById('resultados').className = '';
+    document.getElementById('erros-box').style.display = 'none';
+
+    try {
+      const resp = await fetch('/buscar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ itens, lojas })
+      });
+      const data = await resp.json();
+      renderResultados(data);
+    } catch (e) {
+      alert('Erro ao buscar: ' + e.message);
+    } finally {
+      document.getElementById('loading').style.display = 'none';
+      document.querySelector('.btn-buscar').disabled = false;
+    }
+  }
+
+  function renderResultados(data) {
+    const { comparacao, totais, total_otimo, lojas_selecionadas } = data;
+
+    // Totais
+    const totaisDiv = document.getElementById('totais');
+    totaisDiv.innerHTML = '';
+    lojas_selecionadas.forEach(id => {
+      const c = CORES[id];
+      const div = document.createElement('div');
+      div.className = `total-card total-${c.classe}`;
+      div.innerHTML = `
+        <div class="loja-nome">${c.emoji} ${c.nome}</div>
+        <div class="valor">${fmt(totais[id])}</div>
+        <div class="economia-tag">total da lista</div>`;
+      totaisDiv.appendChild(div);
+    });
+
+    const minLoja = lojas_selecionadas.reduce((a, b) => totais[a] < totais[b] ? a : b);
+    const economia = totais[minLoja] - total_otimo;
+    const divOtimo = document.createElement('div');
+    divOtimo.className = 'total-card otimo';
+    divOtimo.innerHTML = `
+      <div class="loja-nome">✨ Carrinho Ótimo</div>
+      <div class="valor">${fmt(total_otimo)}</div>
+      <div class="economia-tag">${economia > 0.01 ? '💰 economiza ' + fmt(economia) + ' vs melhor mercado' : 'combinando os mais baratos'}</div>`;
+    totaisDiv.appendChild(divOtimo);
+    totaisDiv.classList.add('visivel');
+
+    // Cabeçalho
+    const thead = document.getElementById('tabela-head');
+    thead.innerHTML = '';
+    const trH = document.createElement('tr');
+    trH.innerHTML = '<th>Item</th>' +
+      lojas_selecionadas.map(id => `<th>${CORES[id].emoji} ${CORES[id].nome}</th>`).join('') +
+      '<th>Comprar em</th>';
+    thead.appendChild(trH);
+
+    // Linhas
+    const tbody = document.getElementById('tabela-body');
+    tbody.innerHTML = '';
+    comparacao.forEach(linha => {
+      const tr = document.createElement('tr');
+      let html = `<td class="item-nome">${linha.item}</td>`;
+      lojas_selecionadas.forEach(id => {
+        const prod = linha.lojas[id];
+        const melhor = linha.mais_barato === id;
+        if (prod) {
+          html += `<td>
+            <span class="preco-cell ${melhor ? 'preco-barato' : 'preco-caro'}">${prod.preco_str}</span>
+            ${prod.link ? `<a class="link-produto" href="${prod.link}" target="_blank">→ ver produto</a>` : ''}
+          </td>`;
+        } else {
+          html += `<td><span class="preco-nd">não encontrado</span></td>`;
+        }
+      });
+      if (linha.mais_barato) {
+        const c = CORES[linha.mais_barato];
+        html += `<td><span class="tag-melhor tag-${c.classe}">${c.emoji} ${c.nome}</span></td>`;
+      } else {
+        html += `<td><span class="preco-nd">—</span></td>`;
+      }
+      tr.innerHTML = html;
+      tbody.appendChild(tr);
+    });
+
+    document.getElementById('resultados').classList.add('visivel');
+
+    if (data.erros && data.erros.length > 0) {
+      const box = document.getElementById('erros-box');
+      box.style.display = 'block';
+      box.innerHTML = '<strong>⚠️ Alguns itens tiveram problemas:</strong><br>' + data.erros.join('<br>');
+    }
+  }
+</script>
+</body>
+</html>

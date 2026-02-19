@@ -1,0 +1,40 @@
+# ── Ambientes virtuais ──────────────────────────
+.venv/
+venv/
+env/
+ENV/
+.env
+
+# ── Python ───────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# ── Flask / desenvolvimento ──────────────────────
+instance/
+.webassets-cache
+flask_session/
+
+# ── IDEs e editores ──────────────────────────────
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# ── Sistema operacional ───────────────────────────
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# ── Logs e temporários ───────────────────────────
+*.log
+*.tmp
+*.bak
+*.swp
